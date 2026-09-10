@@ -1,0 +1,39 @@
+name: Build VisibleIsland
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  deb:
+    runs-on: macos-14
+    env:
+      THEOS: ${{ github.workspace }}/theos
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack source zip
+        run: |
+          set -eux
+          unzip -o -q "$(ls -1 *.zip | head -1)" -d src
+          MK="$(find src -name Makefile | awk -F/ '{print NF, $0}' | sort -n | head -1 | cut -d' ' -f2-)"
+          echo "PROJ=$(dirname "$MK")" >> "$GITHUB_ENV"
+      - name: Install Theos
+        run: |
+          set -eux
+          brew install ldid xz make || true
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+      - name: Fetch iPhoneOS SDK
+        run: |
+          set -eux
+          git clone -n --depth 1 --filter=tree:0 https://github.com/theos/sdks.git /tmp/sdks
+          cd /tmp/sdks
+          git sparse-checkout set --no-cone 'iPhoneOS16.5.sdk'
+          git checkout
+          mkdir -p "$THEOS/sdks" && cp -R /tmp/sdks/*.sdk "$THEOS/sdks/"
+      - name: Build rootless
+        run: cd "$PROJ" && make clean && make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
+      - name: Build rootful
+        run: cd "$PROJ" && make clean && make package THEOS_PACKAGE_SCHEME= FINALPACKAGE=1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visibleisland-deb
+          path: ${{ env.PROJ }}/packages/*.deb
+          if-no-files-found: error
