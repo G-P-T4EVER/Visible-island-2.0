@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>title</key>
+	<string>VisibleIsland</string>
+	<key>items</key>
+	<array>
+
+		<!-- ── Master ─────────────────────────────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>General</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Enabled</string>
+			<key>key</key><string>enabled</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/reload</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Always show satellites</string>
+			<key>key</key><string>satellitesEnabled</string>
+			<key>default</key><false/>
+			<key>footerText</key><string>Live activities pop the side satellites out on their own. Turn this on only if you want both of them parked on screen permanently.</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Tap to expand</string>
+			<key>key</key><string>tapToExpand</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Hide in landscape</string>
+			<key>key</key><string>hideInLandscape</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Hide on Lock Screen</string>
+			<key>key</key><string>hideOnCoverSheet</string>
+			<key>default</key><false/>
+			<key>footerText</key><string>Media playback always pauses when the screen is off or the Lock Screen is up, regardless of this switch.</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+
+		<!-- ── Activities ─────────────────────────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Activities</string>
+			<key>footerText</key><string>The pill stays bare until something actually happens. When it does, the two satellites spring out of its edges, and a tap on the pill expands it into a card. Tap the left satellite to play/pause, the right one to skip.</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Live activities</string>
+			<key>key</key><string>activitiesEnabled</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Now Playing</string>
+			<key>key</key><string>activityNowPlaying</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Charging</string>
+			<key>key</key><string>activityCharging</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Ringer switch</string>
+			<key>key</key><string>activityRinger</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Volume</string>
+			<key>key</key><string>activityVolume</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Low Power Mode</string>
+			<key>key</key><string>activityLowPower</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Lock / unlock</string>
+			<key>key</key><string>activityLockState</string>
+			<key>default</key><false/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Satellite controls</string>
+			<key>key</key><string>satelliteActions</string>
+			<key>default</key><true/>
+			<key>footerText</key><string>Off makes the satellites purely decorative — every tap just expands the pill.</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Auto-collapse</string>
+			<key>key</key><string>autoCollapseDelay</string>
+			<key>default</key><real>4</real>
+			<key>min</key><real>1.5</real>
+			<key>max</key><real>12</real>
+			<key>step</key><real>0.5</real>
+			<key>showValue</key><true/>
+			<key>footerText</key><string>Seconds the expanded card stays open before it springs shut.</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+
+		<!-- ── Media ──────────────────────────────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Media</string>
+			<key>footerText</key><string>GIF frames are streamed one at a time and downsampled to the pill size, so a long animation never inflates SpringBoard's memory footprint. MP4 loops through AVPlayerLooper with audio disabled.</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSTitleValueCell</string>
+			<key>id</key><string>mediaStatus</string>
+			<key>label</key><string>Current file</string>
+			<key>cellClass</key><string>VIBlurHeaderCell</string>
+			<key>detailTitle</key><string>None</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Import .gif / .mp4…</string>
+			<key>action</key><string>importMedia:</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Remove media</string>
+			<key>action</key><string>clearMedia:</string>
+			<key>isDestructive</key><true/>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSegmentCell</string>
+			<key>label</key><string>Decoder</string>
+			<key>key</key><string>forcedMediaKind</string>
+			<key>default</key><integer>0</integer>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>Auto</string>
+				<string>GIF</string>
+				<string>MP4</string>
+			</array>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/mediaChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>label</key><string>Fill pill (aspect fill)</string>
+			<key>key</key><string>mediaFillsPill</string>
+			<key>default</key><true/>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>GIF frame-rate cap</string>
+			<key>key</key><string>gifFrameRateCap</string>
+			<key>default</key><real>30</real>
+			<key>min</key><real>0</real>
+			<key>max</key><real>60</real>
+			<key>step</key><real>1</real>
+			<key>showValue</key><true/>
+			<key>footerText</key><string>0 follows the file's own frame delays.</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+
+		<!-- ── Hardware preset ────────────────────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Hardware</string>
+			<key>footerText</key><string>Detected automatically from hw.machine. Override only if the island is misaligned on a spoofed or unlisted model.</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSLinkListCell</string>
+			<key>label</key><string>Device preset</string>
+			<key>key</key><string>presetOverride</string>
+			<key>default</key><string></string>
+			<key>valuesDataSource</key><string>presetValues:</string>
+			<key>titlesDataSource</key><string>presetTitles:</string>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+
+		<!-- ── Geometry trim (0.5 pt steps) ───────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Geometry trim</string>
+			<key>footerText</key><string>Applied on top of the hardware preset. Every slider moves in 0.5 pt steps.</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Offset X</string>
+			<key>key</key><string>offsetX</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-60</real>
+			<key>max</key><real>60</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Offset Y</string>
+			<key>key</key><string>offsetY</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-20</real>
+			<key>max</key><real>60</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Width</string>
+			<key>key</key><string>widthDelta</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-60</real>
+			<key>max</key><real>120</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Height</string>
+			<key>key</key><string>heightDelta</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-12</real>
+			<key>max</key><real>40</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Corner radius</string>
+			<key>key</key><string>cornerRadiusDelta</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-20</real>
+			<key>max</key><real>20</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Satellite size</string>
+			<key>key</key><string>bubbleDiameterDelta</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-10</real>
+			<key>max</key><real>24</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>cellClass</key><string>VIStepSliderCell</string>
+			<key>label</key><string>Module gap</string>
+			<key>key</key><string>moduleGapDelta</string>
+			<key>default</key><real>0</real>
+			<key>min</key><real>-6</real>
+			<key>max</key><real>30</real>
+			<key>step</key><real>0.5</real>
+			<key>PostNotification</key><string>com.sa1nt.visibleisland/prefsChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Reset geometry</string>
+			<key>action</key><string>resetGeometry:</string>
+		</dict>
+
+		<!-- ── Apply ──────────────────────────────────────────────── -->
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Apply</string>
+			<key>footerText</key><string>Geometry and media changes are applied live through a Darwin notification. A respring is only needed after enabling or disabling the tweak.</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Respring</string>
+			<key>action</key><string>respring:</string>
+			<key>isDestructive</key><true/>
+		</dict>
+
+	</array>
+</dict>
+</plist>

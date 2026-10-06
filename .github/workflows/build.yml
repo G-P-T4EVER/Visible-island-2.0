@@ -1,39 +1,122 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  CI: собирает готовые .deb (rootless + rootful) и кладёт их в Artifacts.
+#
+#  Как получить .deb без Mac:
+#    1. Создай репозиторий, залей туда содержимое этой папки.
+#    2. Actions → "Build VisibleIsland" → Run workflow.
+#    3. Скачай артефакт visibleisland-deb.
+#
+#  Основная джоба — macOS (там iPhoneOS SDK идёт с Xcode, самый надёжный путь).
+#  Linux-джоба вторичная: Theos тянет toolchain и SDK сам через install-theos.
+# ─────────────────────────────────────────────────────────────────────────────
+
 name: Build VisibleIsland
+
 on:
   push:
+    branches: [ main, master ]
+  pull_request:
   workflow_dispatch:
+
 jobs:
-  deb:
+
+  # ── Основная сборка: macOS + Xcode ────────────────────────────────────────
+  build-macos:
+    name: Build .deb (macOS)
     runs-on: macos-14
     env:
       THEOS: ${{ github.workspace }}/theos
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Unpack source zip
-        run: |
-          set -eux
-          unzip -o -q "$(ls -1 *.zip | head -1)" -d src
-          MK="$(find src -name Makefile | awk -F/ '{print NF, $0}' | sort -n | head -1 | cut -d' ' -f2-)"
-          echo "PROJ=$(dirname "$MK")" >> "$GITHUB_ENV"
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install Theos
         run: |
           set -eux
           brew install ldid xz make || true
           git clone --recursive https://github.com/theos/theos.git "$THEOS"
-      - name: Fetch iPhoneOS SDK
+          echo "$THEOS/bin" >> "$GITHUB_PATH"
+
+      # Xcode 15 уже содержит iPhoneOS17.x.sdk, но private-заголовков в нём нет.
+      # theos/sdks даёт SDK с полным набором заголовков — нужен для сборки
+      # против SpringBoard/Preferences.
+      - name: Fetch patched iPhoneOS SDKs
         run: |
           set -eux
           git clone -n --depth 1 --filter=tree:0 https://github.com/theos/sdks.git /tmp/sdks
           cd /tmp/sdks
-          git sparse-checkout set --no-cone 'iPhoneOS16.5.sdk'
+          git sparse-checkout set --no-cone 'iPhoneOS16.5.sdk' 'iPhoneOS17.5.sdk'
           git checkout
-          mkdir -p "$THEOS/sdks" && cp -R /tmp/sdks/*.sdk "$THEOS/sdks/"
-      - name: Build rootless
-        run: cd "$PROJ" && make clean && make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
-      - name: Build rootful
-        run: cd "$PROJ" && make clean && make package THEOS_PACKAGE_SCHEME= FINALPACKAGE=1
-      - uses: actions/upload-artifact@v4
+          mkdir -p "$THEOS/sdks"
+          cp -r /tmp/sdks/*.sdk "$THEOS/sdks/" || true
+          ls -1 "$THEOS/sdks"
+
+      - name: Build rootless .deb
+        run: |
+          set -eux
+          make clean
+          make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
+
+      - name: Build rootful .deb
+        run: |
+          set -eux
+          make clean
+          make package THEOS_PACKAGE_SCHEME= FINALPACKAGE=1
+
+      - name: Show packages
+        run: ls -lh packages/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: visibleisland-deb
-          path: ${{ env.PROJ }}/packages/*.deb
+          path: packages/*.deb
           if-no-files-found: error
+          retention-days: 30
+
+  # ── Дублирующая сборка на Linux (без Xcode) ───────────────────────────────
+  # Если macOS-раннер недоступен или закончились минуты — этот путь тоже даёт
+  # рабочий .deb. install-theos сам подтягивает swift-toolchain + SDK.
+  build-linux:
+    name: Build .deb (Linux)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          set -eux
+          sudo apt-get update
+          sudo apt-get install -y build-essential fakeroot git perl zsh curl \
+                                  unzip xz-utils bzip2 lzma libxml2 dpkg-dev
+
+      - name: Install Theos (toolchain + SDK)
+        run: |
+          set -eux
+          # Неинтерактивный режим официального установщика.
+          export THEOS="$THEOS"
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)" < /dev/null
+          echo "$THEOS/bin" >> "$GITHUB_PATH"
+
+      - name: Build both schemes
+        run: |
+          set -eux
+          make clean
+          make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
+          make clean
+          make package THEOS_PACKAGE_SCHEME= FINALPACKAGE=1
+          ls -lh packages/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: visibleisland-deb-linux
+          path: packages/*.deb
+          if-no-files-found: error
+          retention-days: 30

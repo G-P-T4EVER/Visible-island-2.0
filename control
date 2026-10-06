@@ -1,0 +1,17 @@
+Package: com.sa1nt.visibleisland
+Name: VisibleIsland
+Version: 2.0.0
+Section: Tweaks
+Architecture: iphoneos-arm
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader, firmware (>= 14.0)
+Conflicts: com.cydia.visibleisland, com.sa1nt.visibleisland-legacy
+Replaces: com.sa1nt.visibleisland-legacy
+Maintainer: Sa1nt <moonwaredlc12@gmail.com>
+Author: Sa1nt <moonwaredlc12@gmail.com>
+Description: Modular three-section Dynamic Island for devices without one.
+ A dedicated status-bar-level UIWindow renders a center pill plus two
+ activity satellites, driven by a streaming media engine that loops .gif
+ and .mp4 content without ever caching a full frame buffer in RAM.
+ Hardware presets cover iPhone 7 through iPhone 13 Pro Max, with 0.5 pt
+ manual geometry trimming from the preference bundle.
+Tag: purpose::extension, role::enduser, compatible::ios14.0, compatible::ios17.7

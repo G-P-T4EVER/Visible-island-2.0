@@ -1,0 +1,91 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  BOOTSTRAP-СБОРКА "ТОЛЬКО С АЙФОНА"
+#
+#  Этот воркфлоу не требует загружать дерево файлов в репозиторий (с iOS это
+#  невозможно — Safari не умеет заливать папки). Он берёт ЛЮБОЙ .zip в корне
+#  репозитория, распаковывает его, сам находит Makefile и собирает оба .deb.
+#
+#  Порядок действий на телефоне:
+#    1. github.com → New repository → Public → Create.
+#    2. Add file → Upload files → выбрать VisibleIsland-2.0.zip из "Файлов".
+#    3. Add file → Create new file → имя: .github/workflows/build.yml
+#       → вставить этот текст → Commit.
+#    4. Сборка стартует сама (on: push). Вкладка Actions → последний ран.
+#    5. Внизу страницы рана: Artifacts → visibleisland-deb → скачать.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Build VisibleIsland (from zip)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  deb:
+    name: Build .deb
+    runs-on: macos-14
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unpack source zip
+        run: |
+          set -eux
+          ZIP="$(ls -1 *.zip 2>/dev/null | head -1 || true)"
+          if [ -n "$ZIP" ]; then
+            mkdir -p src && unzip -o -q "$ZIP" -d src
+          else
+            # Исходники лежат прямо в репозитории. `cp -R . src/repo` копировал
+            # бы каталог сам в себя, поэтому берём только отслеживаемые файлы.
+            mkdir -p src/repo && git archive HEAD | tar -x -C src/repo
+          fi
+          # Самый неглубокий Makefile = корень проекта (не subproject prefs).
+          MK="$(find src -name Makefile | awk -F/ '{print NF, $0}' | sort -n | head -1 | cut -d' ' -f2-)"
+          test -n "$MK"
+          echo "PROJ=$(dirname "$MK")" >> "$GITHUB_ENV"
+          echo "Project root: $(dirname "$MK")"
+
+      - name: Install Theos
+        run: |
+          set -eux
+          brew install ldid xz make || true
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+
+      - name: Fetch iPhoneOS SDK
+        run: |
+          set -eux
+          git clone -n --depth 1 --filter=tree:0 https://github.com/theos/sdks.git /tmp/sdks
+          cd /tmp/sdks
+          git sparse-checkout set --no-cone 'iPhoneOS16.5.sdk'
+          git checkout
+          mkdir -p "$THEOS/sdks"
+          cp -R /tmp/sdks/*.sdk "$THEOS/sdks/"
+          ls -1 "$THEOS/sdks"
+
+      - name: Build rootless (Dopamine / palera1n rootless)
+        run: |
+          set -eux
+          cd "$PROJ"
+          make clean
+          make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
+
+      - name: Build rootful (checkra1n / unc0ver)
+        run: |
+          set -eux
+          cd "$PROJ"
+          make clean
+          make package THEOS_PACKAGE_SCHEME= FINALPACKAGE=1
+
+      - name: List packages
+        run: ls -lh "$PROJ/packages/"
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: visibleisland-deb
+          path: ${{ env.PROJ }}/packages/*.deb
+          if-no-files-found: error
+          retention-days: 90
